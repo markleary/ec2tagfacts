@@ -22,7 +22,7 @@
 
 ## Overview
 
-This turns EC2 instance tags into puppet facts. For example: `$::ec2_tag_tagname` and structured as `$::ec2_tags['tagname']`. 
+This turns EC2 instance tags into puppet facts. For example: `$::ec2_tag_tagname` and structured as `$::ec2_tags['tagname']`.
 
 ## Setup
 
@@ -164,6 +164,9 @@ Optional. String. Autodetected in ec2tagfacts::params based on OS family. You ca
 Optional. String. Autodetected in ec2tagfacts::params based on OS family. You can override that with the parameter or in hiera. This is the Ruby JSON package name to use. To disable
 management of this package, set to false.
 
+#####`array_facts`
+
+Optional. Array. Array of fact names which should return an array.  Tag values will be split into an array using ',' as the delimiter.  This can be used with Hiera mapped_paths to assign a node to multiple roles based on a single EC2 tag.
 
 ## RSpec Testing
 
@@ -212,5 +215,4 @@ TravisCI is currently testing 25 ruby+puppet environments on 49 OS flavor+parame
 
 ## Limitations
 
-This is written for both CentOS/RHEL/Amazon based systems and Debian/Ubuntu based systems. EPEL is required for the RHEL family in order to obtain the python-pip package to install the AWS cli pip package and is automatically detected and setup. 
-
+This is written for both CentOS/RHEL/Amazon based systems and Debian/Ubuntu based systems. EPEL is required for the RHEL family in order to obtain the python-pip package to install the AWS cli pip package and is automatically detected and setup.

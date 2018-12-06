@@ -18,11 +18,11 @@
 #   awscli must be installed by other means.
 #
 # [*enable_epel*]
-#   True to enable EPEL automatically, false not to. Automatically set in 
+#   True to enable EPEL automatically, false not to. Automatically set in
 #   ec2tagfacts::params based on OS family.
 #
 # [*pippkg*]
-#   Set in ec2tagfacts::params, this is the Python pip package name by OS 
+#   Set in ec2tagfacts::params, this is the Python pip package name by OS
 #   family. False disables python pip package management.
 #
 # [*awscli*]
@@ -31,6 +31,10 @@
 # [*rubyjsonpkg*]
 #   Set in ec2tagfacts::params, this is the ruby-json package name.
 #   False disables ruby-json package package management.
+#
+# [*array_facts*]
+#   Array of fact names which should return an array.  Tag values will be
+#   split into an array using ',' as the delimiter.
 #
 # === Examples
 #
@@ -54,6 +58,11 @@
 #    awscli => 'awscli',
 #  }
 #
+#  /* Set role fact to return an array */
+#  class { 'ec2tagfacts':
+#    array_facts => ['role'],
+#  }
+#
 #
 # === Authors
 #
@@ -74,6 +83,7 @@ class ec2tagfacts (
   $awscli                 = $ec2tagfacts::params::awscli,
   $rubyjsonpkg            = $ec2tagfacts::params::rubyjsonpkg,
   $awscli_pkg             = $ec2tagfacts::params::awscli_pkg,
+  $array_facts            = [],
 
 ) inherits ec2tagfacts::params {
 
@@ -85,6 +95,11 @@ class ec2tagfacts (
   if (!is_string($aws_secret_access_key)) {
     fail('ERROR: ec2tagfacts::aws_secret_access_key must be a string')
   }
+
+  if (!is_array($array_facts)) {
+    fail('ERROR: ec2tagfacts::array_facts must be an array')
+  }
+
 
   if $manage_awscli {
     if $enable_epel {

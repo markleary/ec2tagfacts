@@ -125,17 +125,37 @@ else
           name.gsub!(/\W+/, "_")
           fact = "ec2_tag_#{name}"
 
-          debug_msg("Setting fact #{fact} to #{child['Value']}")
+          # Check if fact is array_tags paramater
+          array_facts.map!(&:downcase)
+          if array_facts.include? name then
 
-          # append to the hash for structured fact later
-          result[name] = child['Value']
 
-          debug_msg("Added #{fact} to results hash for structured fact")
+            debug_msg("Setting fact #{fact} to [ #{child['Value']} ]")
 
-          # set puppet fact - flat version
-          Facter.add("#{fact}") do
-            setcode do
-              child['Value']
+            # append to the hash for structured fact later
+            result[name] = child['Value'].split(',')
+
+            debug_msg("Added #{fact} to results hash for structured fact")
+
+            # set puppet fact - flat version
+            Facter.add("#{fact}") do
+              setcode do
+                child['Value'].split(',')
+              end
+            end
+          else
+            debug_msg("Setting fact #{fact} to #{child['Value']}")
+
+            # append to the hash for structured fact later
+            result[name] = child['Value']
+
+            debug_msg("Added #{fact} to results hash for structured fact")
+
+            # set puppet fact - flat version
+            Facter.add("#{fact}") do
+              setcode do
+                child['Value']
+              end
             end
           end
 
