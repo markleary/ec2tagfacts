@@ -111,7 +111,7 @@ else
       if hash.has_key?("Tags") then
 
         result = {}
-
+        result_arr = {}
         ################################################################################
         #
         # Loop through all tags
@@ -130,15 +130,17 @@ else
 
             debug_msg("Setting fact #{fact} to [ #{child['Value']} ]")
 
+            array_value = child['Value'].split(',').map(&:strip)
+
             # append to the hash for structured fact later
-            result[name] = child['Value'].split(',').map(&:strip)
+            result_arr[name] = array_value
 
             debug_msg("Added #{fact} to results hash for structured fact")
 
             # set puppet fact - flat version
             Facter.add("#{fact}") do
               setcode do
-                result[name]
+                array_value
               end
             end
           end
@@ -175,6 +177,15 @@ else
 
         debug_msg("Structured fact is: #{result}")
 
+        if defined?(result_arr) != nil
+          Facter.add(:ec2_tags_arr) do
+            setcode do
+              result_arr
+            end
+          end
+        end
+
+        debug_msg("Structured array fact is: #{result_arr}")
       else
 
         debug_msg("No tags found")
