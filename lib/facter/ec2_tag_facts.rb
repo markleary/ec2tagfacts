@@ -123,12 +123,10 @@ else
           name = child['Key'].to_s
           name.downcase!
           name.gsub!(/\W+/, "_")
-          fact = "ec2_tag_#{name}"
 
-          # Check if fact is array_tags paramater
-          array_facts.map!(&:downcase)
-          if array_facts.include? name then
-
+          # If value contains commas, create array fact
+          if child['Value'].include? "," then
+            fact = "ec2_tag_arr_#{name}"
 
             debug_msg("Setting fact #{fact} to [ #{child['Value']} ]")
 
@@ -143,21 +141,22 @@ else
                 child['Value'].split(',')
               end
             end
-          else
-            debug_msg("Setting fact #{fact} to #{child['Value']}")
+          end
+          fact = "ec2_tag_#{name}"
+          debug_msg("Setting fact #{fact} to #{child['Value']}")
 
-            # append to the hash for structured fact later
-            result[name] = child['Value']
+          # append to the hash for structured fact later
+          result[name] = child['Value']
 
-            debug_msg("Added #{fact} to results hash for structured fact")
+          debug_msg("Added #{fact} to results hash for structured fact")
 
-            # set puppet fact - flat version
-            Facter.add("#{fact}") do
-              setcode do
-                child['Value']
-              end
+          # set puppet fact - flat version
+          Facter.add("#{fact}") do
+            setcode do
+              child['Value']
             end
           end
+
 
         end
 
