@@ -131,14 +131,14 @@ else
             debug_msg("Setting fact #{fact} to [ #{child['Value']} ]")
 
             # append to the hash for structured fact later
-            result[name] = child['Value'].split(',')
+            result[name] = child['Value'].split(',').map(&:strip)
 
             debug_msg("Added #{fact} to results hash for structured fact")
 
             # set puppet fact - flat version
             Facter.add("#{fact}") do
               setcode do
-                child['Value'].split(',')
+                result[name]
               end
             end
           end
