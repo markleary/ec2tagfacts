@@ -124,31 +124,17 @@ else
           name.downcase!
           name.gsub!(/\W+/, "_")
 
-          # If value contains commas, create array fact
-          if child['Value'].include? "," then
-            fact = "ec2_tag_arr_#{name}"
-
-            debug_msg("Setting fact #{fact} to [ #{child['Value']} ]")
-
-            array_value = child['Value'].split(',').map(&:strip)
-
-            # append to the hash for structured fact later
-            result_arr[name] = array_value
-
-            debug_msg("Added #{fact} to results hash for structured fact")
-
-            # set puppet fact - flat version
-            Facter.add("#{fact}") do
-              setcode do
-                array_value
-              end
-            end
-          end
           fact = "ec2_tag_#{name}"
+          afact = "ec2_tag_arr_#{name}"
+
+          array_value = child['Value'].split(',').map(&:strip)
+
           debug_msg("Setting fact #{fact} to #{child['Value']}")
+          debug_msg("Setting fact #{afact} to #{array_value}")
 
           # append to the hash for structured fact later
           result[name] = child['Value']
+          result_arr[name] = array_value
 
           debug_msg("Added #{fact} to results hash for structured fact")
 
@@ -158,7 +144,11 @@ else
               child['Value']
             end
           end
-
+          Facter.add("#{afact}") do
+            setcode do
+              array_value
+            end
+          end
 
         end
 
